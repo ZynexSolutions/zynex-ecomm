@@ -28,8 +28,8 @@ const Blog1 = () => {
                       <a href="#"><Image src="/assets/img/icons/blog-icon1.png" alt="img" width={16} height={16}   /> John William</a>
                       <a href="#"><Image src="/assets/img/icons/blog-icon2.png" alt="img" width={16} height={16}   /> Feb 25, 24</a>
                     </div>
-                    <h4><Link href="/blog/blog-details">Demystifying Blockchain: How It is Revolutionising Industries.</Link></h4>
-                    <Link href="/blog/blog-details" className="learn">Learn More <span><i className="fa fa-long-arrow-right" aria-hidden="true"></i></span></Link>
+                    <h4><Link href="/blog/blog-details-center">Demystifying Blockchain: How It is Revolutionising Industries.</Link></h4>
+                    <Link href="/blog/blog-details-center" className="learn">Learn More <span><i className="fa fa-long-arrow-right" aria-hidden="true"></i></span></Link>
                   </div>
                 </div>
               </div>
@@ -44,8 +44,8 @@ const Blog1 = () => {
                     <a href="#"><Image src="/assets/img/icons/blog-icon1.png" alt="img" width={16} height={16}   /> John William</a>
                     <a href="#"><Image src="/assets/img/icons/blog-icon2.png" alt="img" width={16} height={16}   /> Feb 25, 24</a>
                     </div>
-                    <h4><Link href="/blog/blog-details">Cybersecurity Essentials: Protecting Your Business </Link></h4>
-                    <Link href="/blog/blog-details" className="learn"> Learn More <span><i className="fa fa-long-arrow-right" aria-hidden="true"></i></span></Link>
+                    <h4><Link href="/blog/blog-details-center">Cybersecurity Essentials: Protecting Your Business </Link></h4>
+                    <Link href="/blog/blog-details-center" className="learn"> Learn More <span><i className="fa fa-long-arrow-right" aria-hidden="true"></i></span></Link>
                   </div>
                 </div>
               </div>
@@ -60,8 +60,8 @@ const Blog1 = () => {
                     <a href="#"><Image src="/assets/img/icons/blog-icon1.png" alt="img" width={16} height={16}   /> John William</a>
                     <a href="#"><Image src="/assets/img/icons/blog-icon2.png" alt="img" width={16} height={16}   /> Feb 25, 24</a>
                     </div>
-                    <h4><Link href="/blog/blog-details">The Future of Work: Embracing Remote Collaboration Tools</Link></h4>
-                    <Link href="/blog/blog-details" className="learn"> Learn More <span><i className="fa fa-long-arrow-right" aria-hidden="true"></i></span></Link>
+                    <h4><Link href="/blog/blog-details-center">The Future of Work: Embracing Remote Collaboration Tools</Link></h4>
+                    <Link href="/blog/blog-details-center" className="learn"> Learn More <span><i className="fa fa-long-arrow-right" aria-hidden="true"></i></span></Link>
                   </div>
                 </div>
               </div>
