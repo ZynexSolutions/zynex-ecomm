@@ -5,7 +5,7 @@ import Image from "next/image";
 
 const Services1 = () => {
   return (
-    <div className="service sp">
+    <div className="service sp" id="service">
       <div className="container">
         <div className="row">
           <div className="col-lg-8 m-auto text-center">

@@ -31,10 +31,11 @@ const Footer1 = () => {
                                    <h3>Service We Offer</h3>
 
                                    <ul className="menu-list">
-                                        <li><Link href="/service/service-details">Cloud Computing Solution</Link></li>
-                                        <li><Link href="/service/service-details">Cybersecurity & Compliance</Link></li>
-                                        <li><Link href="/service/service-details">Software Development</Link></li>
-                                        <li><Link href="/service/service-details">It Consulting & Support</Link></li>
+                                        <li><Link href="/#service">Web Development Services</Link></li>
+                                        <li><Link href="/#service">Ecommerce Solutions</Link></li>
+                                        <li><Link href="/#service">Android & iOS App Development</Link></li>
+                                        <li><Link href="/#service">LLM & Gen AI Services</Link></li>
+                                        <li><Link href="/#service">Digital Marketing</Link></li>
                                    </ul>
                               </div>
                          </div>
@@ -44,10 +45,10 @@ const Footer1 = () => {
                                    <h3>Useful Links</h3>
 
                                    <ul className="menu-list">
+                                        <li><Link href="/">Home</Link></li>
+                                        <li><Link href="/portfolio">Portfolio</Link></li>
+                                        <li><Link href="/blog">Articles</Link></li>
                                         <li><Link href="/about">About Us </Link></li>
-                                        <li><Link href="/service">Our Services</Link></li>
-                                        <li><Link href="/blog">Blog & News</Link></li>
-                                        <li><Link href="/project">Project</Link></li>
                                         <li><Link href="/contact">Contact Us</Link></li>
                                    </ul>
                               </div>
@@ -58,14 +59,14 @@ const Footer1 = () => {
                               <div className="single-footer-items">
                                    <h3>Contact Us</h3>
 
-                                   <div className="contact-box">
+                                   {/* <div className="contact-box">
                                         <div className="icon">
                                              <Image src="/assets/img/icons/footer1-icon1.png" alt="img" width={24} height={24} />
                                         </div>
                                         <div className="pera">
                                              <a href="tel:0500222333">0500 222 333</a>
                                         </div>
-                                   </div>
+                                   </div> */}
 
                                    <div className="contact-box">
                                         <div className="icon">
@@ -81,7 +82,7 @@ const Footer1 = () => {
                                              <Image src="/assets/img/icons/footer1-icon3.png" alt="img" width={24} height={24} />
                                         </div>
                                         <div className="pera">
-                                             <a href="mailto:admin@techxen.org">admin@techxen.org</a>
+                                             <a href="mailto:enquire@zynexsolutions.com">enquire@zynexsolutions.com</a>
                                         </div>
                                    </div>
 
