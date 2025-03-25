@@ -13,8 +13,8 @@ const page = () => {
     return (
         <div>
             <HeroBanner4
-                subtitle="Hi, We are TechXen 👋"
-                title="TechXen Tech Solution Partners"
+                subtitle="Hi, We are Zynex Solutions"
+                title="Get Full Control Of Your Online Store"
                 content="Streamline operations, increase efficiency, and drive growth with <br> our innovative IT solutions."
                 btnone="Get A Quote"
                 btnoneurl="/contact"
