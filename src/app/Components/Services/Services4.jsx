@@ -12,8 +12,8 @@ const Services4 = () => {
                     <div className="col-lg-8 m-auto text-center">
                         <div className="heading4">
                             <SectionTitle2
-                                SubTitle="Our Service 👋"
-                                Title="Comprehensive IT Solution Services"
+                                SubTitle="Features ✨"
+                                Title="Everything that you care about"
                             ></SectionTitle2>
                         </div>
                     </div>
@@ -22,23 +22,23 @@ const Services4 = () => {
                 <div className="space30"></div>
                 <div className="row">
 
-                {data.map((item, i) => (
-                    <div key={i} className="col-lg-3 col-md-6" data-aos="zoom-in-up" data-aos-duration="800">
-                        <div className={item.addClass}>
-                            <div className="icon">
-                            <Image src={item.icon} alt="img" width={40} height={40}   />
-                            </div>
-                            <div className="heading4">
-                                <h4><Link href={item.btnLink}>{parse(item.title)}</Link></h4>
-                                <div className="space16"></div>
-                                <p>{item.desc} </p>
-                                <div className="space16"></div>
-                                <Link href={item.btnLink} className="learn-btn">Read More <span><i className="bi bi-arrow-right"></i></span></Link>
+                    {data.map((item, i) => (
+                        <div key={i} className="col-lg-3 col-md-6" data-aos="zoom-in-up" data-aos-duration="800">
+                            <div className={item.addClass}>
+                                <div className="icon">
+                                    <Image src={item.icon} alt="img" width={40} height={40} />
+                                </div>
+                                <div className="heading4">
+                                    <h4><Link href={item.btnLink}>{parse(item.title)}</Link></h4>
+                                    <div className="space16"></div>
+                                    <p>{item.desc} </p>
+                                    <div className="space16"></div>
+                                    <Link href={item.btnLink} className="learn-btn">Read More <span><i className="bi bi-arrow-right"></i></span></Link>
+                                </div>
                             </div>
                         </div>
-                    </div>
                     ))}
-                    
+
                 </div>
 
                 <div className="space40"></div>
