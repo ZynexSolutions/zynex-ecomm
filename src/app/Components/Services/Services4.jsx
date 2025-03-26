@@ -12,8 +12,8 @@ const Services4 = () => {
                     <div className="col-lg-8 m-auto text-center">
                         <div className="heading4">
                             <SectionTitle2
-                                SubTitle="Features ✨"
-                                Title="Everything that you care about"
+                                SubTitle="Tailored For You ✨"
+                                Title="Powerful Features that Standard Platforms Just Can't Match"
                             ></SectionTitle2>
                         </div>
                     </div>
@@ -21,7 +21,6 @@ const Services4 = () => {
 
                 <div className="space30"></div>
                 <div className="row">
-
                     {data.map((item, i) => (
                         <div key={i} className="col-lg-3 col-md-6" data-aos="zoom-in-up" data-aos-duration="800">
                             <div className={item.addClass}>

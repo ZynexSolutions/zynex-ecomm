@@ -13,7 +13,7 @@ const page = () => {
     return (
         <div>
             <HeroBanner4
-                subtitle="Hi, We are Zynex Solutions"
+                subtitle="For Ambitious Store Owners"
                 title="Reclaim Full Control Of Your Online Store"
                 content="Reimagine your online store with infinite customization. Gain total control over your data, limitless design flexibility and endless features that standard e-commerce platforms just can't match."
                 btnone="Contact Us"
