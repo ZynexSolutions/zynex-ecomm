@@ -26,33 +26,5 @@
     "desc": "Navigate the complexities of the digital landscape with confidence with our IT.",
     "btnLink": "/service/service-details",
     "addClass": "service4-box"
-  },
-  {
-    "icon": "/assets/img/icons/service4-icon1.png",
-    "title": "POS & Multi Channel <br/> Selling",
-    "desc": "Unlock actionable insights and drive informed decision-making with our advanced",
-    "btnLink": "/service/service-details",
-    "addClass": "service4-box"
-  },
-  {
-    "icon": "/assets/img/icons/service4-icon1.png",
-    "title": "Payment Gateway <br/> Integration",
-    "desc": "Unlock actionable insights and drive informed decision-making with our advanced",
-    "btnLink": "/service/service-details",
-    "addClass": "service4-box"
-  },
-  {
-    "icon": "/assets/img/icons/service4-icon1.png",
-    "title": "Advanced Promotions Engine",
-    "desc": "Unlock actionable insights and drive informed decision-making with our advanced",
-    "btnLink": "/service/service-details",
-    "addClass": "service4-box"
-  },
-  {
-    "icon": "/assets/img/icons/service4-icon1.png",
-    "title": "Easy Social Logins<br/><br/>",
-    "desc": "Unlock actionable insights and drive informed decision-making with our advanced",
-    "btnLink": "/service/service-details",
-    "addClass": "service4-box"
   }
 ]
