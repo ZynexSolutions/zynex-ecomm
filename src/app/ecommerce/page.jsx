@@ -28,23 +28,23 @@ const page = () => {
                 image3="/assets/img/about/about4-img3.png"
                 shape1="/assets/img/shapes/about3-shape1.png"
                 subTitle="About Us 👋"
-                Title="Innovative IT Solutions For Modern Businesses"
-                content="Our journey began with a vision to empower businesses of all sizes with cutting-edge technology solutions tailored to their unique needs. Our team of experienced professionals brings together a diverse range"
-                expNum="25"
+                Title="Your Partners in Building Your Next Dream Store"
+                content="Go beyond templates with Zynex Solutions. We craft high-performance, truly custom e-commerce stores. Achieve unparalleled design freedom, integrate the exact features you need, and own your platform for scalable growth and exceptional performance."
+                expNum="4+"
                 expCon="Years Experience"
                 featurelist={[
-                    "Tech Solution",
-                    "It Consulting",
-                    "Cyber Security",
+                    "True Design Freedom",
+                    "Unparalleled Features",
+                    "Lower Maintenance Costs",
                 ]}
-                btnName="Read More"
+                btnName="Contact Us"
                 btnUrl="/about"
             ></About4>
             <Services4></Services4>
-            <HowWork3></HowWork3>
+            {/* <HowWork3></HowWork3> */}
             <Project3></Project3>
-            <Pricing1></Pricing1>
             <Testimonial3></Testimonial3>
+            <Pricing1></Pricing1>
             <Blog4></Blog4>
             <Cta3></Cta3>
         </div>
