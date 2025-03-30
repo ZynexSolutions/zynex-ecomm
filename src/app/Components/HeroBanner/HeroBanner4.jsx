@@ -57,16 +57,16 @@ const HeroBanner4 = ({ subtitle, title, content, btnone, btnoneurl, btntwo, btnt
                 <div className="logo-slider owl-carousel hero_gap_4">
                   <Slider {...settings}>
                     <div className="single-slider">
-                      <Image src="/assets/img/logo/slider-img1.png" alt="img" width={94} height={24} />
+                      <Image src="/assets/custom/logo/img1.png" alt="img" width={94} height={24} />
                     </div>
                     <div className="single-slider">
-                      <Image src="/assets/img/logo/slider-img2.png" alt="img" width={94} height={24} />
+                      <Image src="/assets/custom/logo/img2.png" alt="img" width={94} height={24} />
                     </div>
                     <div className="single-slider">
-                      <Image src="/assets/img/logo/slider-img3.png" alt="img" width={94} height={24} />
+                      <Image src="/assets/custom/logo/img3.png" alt="img" width={94} height={24} />
                     </div>
                     <div className="single-slider">
-                      <Image src="/assets/img/logo/slider-img4.png" alt="img" width={94} height={18} />
+                      <Image src="/assets/custom/logo/img4.png" alt="img" width={94} height={18} />
                     </div>
                   </Slider>
                 </div>

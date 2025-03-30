@@ -6,28 +6,28 @@ import Image from 'next/image';
 
 const data = [
     {
-        "icon": "/assets/img/icons/service4-icon1.png",
+        "icon": "/assets/custom/icons/icon1.png",
         "title": "Complete Design <br/> Flexibility",
         "desc": "Unlock actionable insights and drive informed decision-making with our advanced",
         "btnLink": "/service/service-details",
         "addClass": "service4-box"
     },
     {
-        "icon": "/assets/img/icons/service4-icon2.png",
+        "icon": "/assets/custom/icons/icon2.png",
         "title": "Comprehensive <br/>Dashboard",
         "desc": "Harness the power of the cloud with our robust cloud computing solutions.",
         "btnLink": "/service/service-details",
         "addClass": "service4-box"
     },
     {
-        "icon": "/assets/img/icons/service4-icon1.png",
+        "icon": "/assets/custom/icons/icon3.png",
         "title": "POS & Multi Channel <br/> Selling",
         "desc": "Unlock actionable insights and drive informed decision-making with our advanced",
         "btnLink": "/service/service-details",
         "addClass": "service4-box"
     },
     {
-        "icon": "/assets/img/icons/service4-icon4.png",
+        "icon": "/assets/custom/icons/icon4.png",
         "title": "Currency Localization & Multi Region Support",
         "desc": "Navigate the complexities of the digital landscape with confidence with our IT.",
         "btnLink": "/service/service-details",
