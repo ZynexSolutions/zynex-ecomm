@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect, useMemo } from "react";
 import Chart from "react-apexcharts";
-import CustomRangeSlider from "./CustomRange"; // Assuming this path is correct
+import CustomRangeSlider from "./CustomRangeSlider"; // Assuming this path is correct
 // Import the estimation function
 import { estimateEcommerceCosts } from "../Utils/estimate"; // Adjust path if needed
 
