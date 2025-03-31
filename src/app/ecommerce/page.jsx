@@ -8,6 +8,7 @@ import Pricing1 from '../Components/Pricing/Pricing1';
 import Testimonial3 from '../Components/Testimonial/Testimonial3';
 import Blog4 from '../Components/Blog/Blog4';
 import Cta3 from '../Components/Cta/Cta3';
+import { CustomPricing } from '../Components/Pricing/PricingCustom';
 
 const page = () => {
     return (
@@ -44,7 +45,8 @@ const page = () => {
             {/* <HowWork3></HowWork3> */}
             <Project3></Project3>
             <Testimonial3></Testimonial3>
-            <Pricing1></Pricing1>
+            {/* <Pricing1></Pricing1> */}
+            <CustomPricing />
             <Blog4></Blog4>
             <Cta3></Cta3>
         </div>
