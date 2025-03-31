@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect, useMemo } from "react";
 import Chart from "react-apexcharts";
-import CustomRangeSlider from "./CustomRangeSlider"; // Assuming this path is correct
+import CustomRangeSlider from "./CustomRange"; // Assuming this path is correct
 // Import the estimation function
 import { estimateEcommerceCosts } from "../Utils/estimate"; // Adjust path if needed
 
@@ -295,13 +295,6 @@ export function CustomPricing() {
     return 0; // Default to 0 if no savings or invalid data
   };
 
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    // This will ensure the code runs only after the component is mounted on the client side
-    setIsClient(true);
-  }, []);
-
   const savingsPercentage = calculateSavings();
   // --- End Calculation Logic ---
 
@@ -404,7 +397,7 @@ export function CustomPricing() {
                 {" "}
                 {/* Added a class for potential styling */}
                 {/* Conditional rendering prevents chart flash on server/initial load */}
-                {isClient && chartData.length > 0 && (
+                {typeof window !== "undefined" && chartData.length > 0 && (
                   <Chart
                     options={chartOptions}
                     // Pass series dynamically here
