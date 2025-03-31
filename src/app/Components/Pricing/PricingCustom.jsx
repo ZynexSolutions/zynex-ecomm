@@ -132,7 +132,10 @@ export function CustomPricing() {
           <div className="custom-pricing-card">
             <div className="custom-pricing-grid">
               {/* Left Column: Controls & Savings */}
-              <div className="custom-pricing-left-col">
+              <div
+                className="custom-pricing-left-col"
+                style={{ marginRight: "20px" }}
+              >
                 <div className="custom-pricing-left-col-top">
                   {" "}
                   <div className="heading4">
