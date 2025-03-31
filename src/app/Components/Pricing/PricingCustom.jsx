@@ -295,6 +295,13 @@ export function CustomPricing() {
     return 0; // Default to 0 if no savings or invalid data
   };
 
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    // This will ensure the code runs only after the component is mounted on the client side
+    setIsClient(true);
+  }, []);
+
   const savingsPercentage = calculateSavings();
   // --- End Calculation Logic ---
 
@@ -397,7 +404,7 @@ export function CustomPricing() {
                 {" "}
                 {/* Added a class for potential styling */}
                 {/* Conditional rendering prevents chart flash on server/initial load */}
-                {typeof window !== "undefined" && chartData.length > 0 && (
+                {isClient && chartData.length > 0 && (
                   <Chart
                     options={chartOptions}
                     // Pass series dynamically here
