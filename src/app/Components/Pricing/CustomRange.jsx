@@ -1,15 +1,12 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useRef, useEffect } from 'react';
 
 const CustomRangeSlider = ({
     min = 0,
     max = 100,
-    defaultValue = 50,
+    value, // Receive value as a prop
     onChange,
     className = ''
 }) => {
-    // State to track the current value of the slider
-    const [value, setValue] = useState(defaultValue);
-
     // References to DOM elements
     const sliderRef = useRef(null);
     const trackRef = useRef(null);
@@ -28,15 +25,16 @@ const CustomRangeSlider = ({
         const percentageClicked = (x / rect.width) * 100;
 
         // Ensure the value stays within bounds
-        const newValue = Math.min(max, Math.max(min,
+        let newValue = Math.min(max, Math.max(min,
             min + (percentageClicked / 100) * (max - min)
         ));
 
-        setValue(newValue);
+        // Round the newValue to the nearest integer
+        newValue = Math.round(newValue);
 
         // Call the onChange callback if provided
         if (onChange) {
-            onChange(newValue);
+            onChange(newValue); // Pass the new value to the parent
         }
     };
 

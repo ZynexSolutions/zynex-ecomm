@@ -13,19 +13,19 @@
     "apexcharts": "^4.5.0",
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
-    "html-react-parser": "^5.1.18",
+    "html-react-parser": "^5.2.2",
     "next": "14.2.15",
     "posthog-js": "^1.229.5",
-    "react": "^18",
+    "react": "^18.3.1",
     "react-apexcharts": "^1.7.0",
-    "react-bootstrap": "^2.10.5",
+    "react-bootstrap": "^2.10.9",
     "react-compound-slider": "^3.4.0",
-    "react-dom": "^18",
-    "react-slick": "^0.30.2",
+    "react-dom": "^18.3.1",
+    "react-slick": "^0.30.3",
     "slick-carousel": "^1.8.1"
   },
   "devDependencies": {
-    "eslint": "^8",
+    "eslint": "^8.57.1",
     "eslint-config-next": "14.2.15"
   },
   "packageManager": "pnpm@10.5.2+sha512.da9dc28cd3ff40d0592188235ab25d3202add8a207afbedc682220e4a0029ffbff4562102b9e6e46b4e3f9e8bd53e6d05de48544b0c57d4b0179e22c76d1199b"
