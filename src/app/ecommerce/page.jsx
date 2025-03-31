@@ -8,6 +8,7 @@ import Pricing1 from "../Components/Pricing/Pricing1";
 import Testimonial3 from "../Components/Testimonial/Testimonial3";
 import Blog4 from "../Components/Blog/Blog4";
 import Cta3 from "../Components/Cta/Cta3";
+import { CustomPricing } from "../Components/Pricing/PricingCustom";
 
 const page = () => {
   return (
@@ -26,7 +27,7 @@ const page = () => {
         image1="/images/ecomm2.png"
         image2="/images/ecomm3.png"
         image3="/images/ecomm4.png"
-        shape1="/images/ecommshape.png"
+        shape1="/assets/img/shapes/about3-shape1.png"
         subTitle="About Us 👋"
         Title="Your Partners in Building Your Next Dream Store"
         content="Go beyond templates with Zynex Solutions. We craft high-performance, truly custom e-commerce stores. Achieve unparalleled design freedom, integrate the exact features you need, and own your platform for scalable growth and exceptional performance."
@@ -44,7 +45,8 @@ const page = () => {
       {/* <HowWork3></HowWork3> */}
       <Project3></Project3>
       {/* <Testimonial3></Testimonial3> */}
-      <Pricing1></Pricing1>
+      {/* <Pricing1></Pricing1> */}
+      <CustomPricing />
       <Blog4></Blog4>
       <Cta3></Cta3>
     </div>

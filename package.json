@@ -10,13 +10,16 @@
   },
   "dependencies": {
     "airtable": "^0.12.2",
+    "apexcharts": "^4.5.0",
     "bootstrap": "^5.3.3",
     "bootstrap-icons": "^1.11.3",
     "html-react-parser": "^5.1.18",
     "next": "14.2.15",
     "posthog-js": "^1.229.5",
     "react": "^18",
+    "react-apexcharts": "^1.7.0",
     "react-bootstrap": "^2.10.5",
+    "react-compound-slider": "^3.4.0",
     "react-dom": "^18",
     "react-slick": "^0.30.2",
     "slick-carousel": "^1.8.1"
