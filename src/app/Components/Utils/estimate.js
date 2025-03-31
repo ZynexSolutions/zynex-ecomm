@@ -25,7 +25,7 @@
  *                          ]
  *                          The 'max_cost' will be set to Infinity if the document indicated '+'.
  */
-function estimateEcommerceCosts(user_count, inventory_size) {
+export function estimateEcommerceCosts(user_count, inventory_size) {
     const results = [];
     const plusNote = "Upper range can be significantly higher ('+' in source).";
 

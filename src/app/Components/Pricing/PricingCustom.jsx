@@ -1,136 +1,173 @@
 "use client";
-import React, { useState, useEffect } from "react";
-// Assuming ApexCharts and Chart are used correctly elsewhere or needed for context
-// import ApexCharts from "apexcharts"; 
+import React, { useState, useEffect, useMemo } from "react";
 import Chart from "react-apexcharts";
-import CustomRangeSlider, { CustomRange } from "./CustomRange"; // Assuming this path is correct
+import CustomRangeSlider from "./CustomRange"; // Assuming this path is correct
+// Import the estimation function
+import { estimateEcommerceCosts } from '../Utils/estimate'; // Adjust path if needed
 
 export function CustomPricing() {
     // --- State ---
     const [audienceSize, setAudienceSize] = useState(40000);
     const [inventorySize, setInventorySize] = useState(2000);
+    const [estimatedCosts, setEstimatedCosts] = useState([]); // State to hold calculation results
 
     // Temporary state for input fields to allow free typing
     const [audienceInput, setAudienceInput] = useState(audienceSize.toString());
     const [inventoryInput, setInventoryInput] = useState(inventorySize.toString());
 
     // --- Constants ---
+    // Input field bounds (soft validation) - adjust if needed
     const AUDIENCE_UPPER_BOUND = 100000;
-    const AUDIENCE_LOWER_BOUND = 2500;
+    const AUDIENCE_LOWER_BOUND = 100; // Min sensible value for estimation
     const INVENTORY_UPPER_BOUND = 10000;
-    const INVENTORY_LOWER_BOUND = 300;
+    const INVENTORY_LOWER_BOUND = 10; // Min sensible value for estimation
 
-    const AUDIENCE_MIN = 0;
-    const AUDIENCE_MAX = 100000;
-    const INVENTORY_MIN = 0;
-    const INVENTORY_MAX = 10000;
+    // Slider bounds
+    const AUDIENCE_MIN_SLIDER = 100;
+    const AUDIENCE_MAX_SLIDER = 100000;
+    const INVENTORY_MIN_SLIDER = 10;
+    const INVENTORY_MAX_SLIDER = 10000;
+
+    // --- Effect to Calculate Costs ---
+    useEffect(() => {
+        // Ensure valid numbers before calculating
+        const validAudience = Math.max(AUDIENCE_LOWER_BOUND, Math.min(AUDIENCE_UPPER_BOUND, audienceSize));
+        const validInventory = Math.max(INVENTORY_LOWER_BOUND, Math.min(INVENTORY_UPPER_BOUND, inventorySize));
+
+        const results = estimateEcommerceCosts(validAudience, validInventory);
+
+        console.log("[shopify ]", results[0].min_cost);
+        console.log("[woo ]", results[1].min_cost);
+        console.log("[medusa ]", results[2].min_cost);
+
+        setEstimatedCosts(results);
+
+    }, [audienceSize, inventorySize]); // Recalculate when size changes
 
     // --- Update Functions (Validation and State Commit) ---
     function updateAudienceSize(value) {
         const numericValue = parseInt(value, 10);
 
-        // Handle NaN or invalid input - revert to current valid state
         if (isNaN(numericValue)) {
-            setAudienceInput(audienceSize.toString()); // Reset input display
+            setAudienceInput(audienceSize.toString());
             return;
         }
 
-        let finalValue = numericValue;
-        if (numericValue > AUDIENCE_UPPER_BOUND) {
-            finalValue = AUDIENCE_UPPER_BOUND;
-        } else if (numericValue < AUDIENCE_LOWER_BOUND) {
-            finalValue = AUDIENCE_LOWER_BOUND;
-        }
+        // Apply bounds used for calculation
+        let finalValue = Math.max(AUDIENCE_LOWER_BOUND, Math.min(AUDIENCE_UPPER_BOUND, numericValue));
+
         setAudienceSize(finalValue);
-        // Sync input field *after* validation
+        // Sync input field *after* validation/bounding
         setAudienceInput(finalValue.toString());
     }
 
     function updateInventorySize(value) {
         const numericValue = parseInt(value, 10);
 
-        // Handle NaN or invalid input - revert to current valid state
         if (isNaN(numericValue)) {
-            setInventoryInput(inventorySize.toString()); // Reset input display
+            setInventoryInput(inventorySize.toString());
             return;
         }
 
-        let finalValue = numericValue;
-        if (numericValue > INVENTORY_UPPER_BOUND) {
-            finalValue = INVENTORY_UPPER_BOUND;
-        } else if (numericValue < INVENTORY_LOWER_BOUND) {
-            finalValue = INVENTORY_LOWER_BOUND;
-        }
+        // Apply bounds used for calculation
+        let finalValue = Math.max(INVENTORY_LOWER_BOUND, Math.min(INVENTORY_UPPER_BOUND, numericValue));
+
         setInventorySize(finalValue);
-        // Sync input field *after* validation
+        // Sync input field *after* validation/bounding
         setInventoryInput(finalValue.toString());
     }
 
     // --- Input Field Handlers ---
     const handleAudienceInputChange = (e) => {
-        // Allow any typing in the input field
         setAudienceInput(e.target.value);
     };
 
     const handleInventoryInputChange = (e) => {
-        // Allow any typing in the input field
         setInventoryInput(e.target.value);
     };
 
     const commitAudienceChange = () => {
-        // Validate and update state when input loses focus or Enter is pressed
         updateAudienceSize(audienceInput);
     };
 
     const commitInventoryChange = () => {
-        // Validate and update state when input loses focus or Enter is pressed
         updateInventorySize(inventoryInput);
     };
 
     const handleAudienceKeyDown = (e) => {
         if (e.key === 'Enter') {
             commitAudienceChange();
-            e.target.blur(); // Optional: remove focus after Enter
+            e.target.blur();
         }
     };
 
     const handleInventoryKeyDown = (e) => {
         if (e.key === 'Enter') {
             commitInventoryChange();
-            e.target.blur(); // Optional: remove focus after Enter
+            e.target.blur();
         }
     };
 
-
-    // --- Effects ---
-    // Sync input fields if the main state changes (e.g., via slider)
+    // --- Effects to Sync Inputs from State (e.g., slider changes) ---
     useEffect(() => {
-        setAudienceInput(audienceSize.toString());
+        // Only update input if it differs from the validated state string representation
+        if (audienceInput !== audienceSize.toString()) {
+            setAudienceInput(audienceSize.toString());
+        }
     }, [audienceSize]);
 
     useEffect(() => {
-        setInventoryInput(inventorySize.toString());
+        // Only update input if it differs from the validated state string representation
+        if (inventoryInput !== inventorySize.toString()) {
+            setInventoryInput(inventorySize.toString());
+        }
     }, [inventorySize]);
 
+    // --- Chart Data and Options ---
+    const chartData = useMemo(() => {
+        // Map estimatedCosts to chart series data, using min_cost
+        // Order must match xaxis categories: Shopify, WooCommerce, Your Custom Store
+        const shopifyCost = estimatedCosts.find(c => c.platform === 'Shopify')?.min_cost ?? 0;
+        const wooCost = estimatedCosts.find(c => c.platform === 'WooCommerce (AWS)')?.min_cost ?? 0;
+        // Map Medusa JS to 'Your Custom Store'
+        const customCost = estimatedCosts.find(c => c.platform === 'Medusa JS (AWS)')?.min_cost ?? 0;
 
-    // --- Calculations & Chart Config (Keep as is) ---
-    const calculateSavings = () => {
-        return 35; // Static value from design
-    };
+        // Handle potential Infinity values for display (though min_cost shouldn't be Infinity here)
+        // If using max_cost, this would be more important. Example:
+        // const capInfinity = (cost) => (cost === Infinity ? 30000 : cost); // Cap at 30k for chart
 
-    const chartOptions = {
-        // ... (Keep your existing chart options)
+        return [
+            Math.round(shopifyCost), // Use Math.round for cleaner bars
+            Math.round(wooCost),
+            Math.round(customCost)
+        ];
+    }, [estimatedCosts]); // Recalculate chart data only when estimatedCosts changes
+
+    const chartOptions = useMemo(() => ({
         chart: {
             type: "bar",
             height: 350,
             toolbar: { show: false },
+            animations: { // Move animations here
+                enabled: true,
+                easing: "easeinout",
+                speed: 500, // Slightly faster might feel better
+                animateGradually: {
+                    enabled: false, // Gradual animation might look weird with changing data
+                    delay: 150,
+                },
+                dynamicAnimation: {
+                    enabled: true,
+                    speed: 350,
+                },
+            },
         },
         plotOptions: {
             bar: {
                 borderRadius: 8,
                 columnWidth: "60%",
-                endingShape: "rounded",
-                distributed: true,
+                // endingShape: "rounded", // Use borderRadius instead
+                distributed: true, // Color per bar
             },
         },
         dataLabels: {
@@ -139,19 +176,13 @@ export function CustomPricing() {
         stroke: {
             show: false,
         },
-        series: [
-            {
-                name: "Estimated Cost",
-                // TODO: Make chart data dynamic based on audience/inventory if needed
-                data: [1000, 800, 200],
-            },
-        ],
+        // Series data is now managed outside this memoized object
         xaxis: {
             categories: ["Shopify", "WooCommerce", "Your Custom Store"],
             labels: {
                 style: {
                     fontSize: "12px",
-                    fontFamily: "Helvetica, Arial, sans-serif",
+                    fontFamily: "inherit", // Inherit font
                     fontWeight: 500,
                     colors: "#333",
                 },
@@ -162,15 +193,18 @@ export function CustomPricing() {
                 text: "Estimated Cost per Mo (in $)",
                 style: {
                     fontSize: "14px",
-                    fontFamily: "Helvetica, Arial, sans-serif",
+                    fontFamily: "inherit",
                     fontWeight: 600,
                     colors: "#333",
                 },
             },
             labels: {
+                formatter: function (val) { // Format Y-axis labels as currency
+                    return "$" + val.toLocaleString();
+                },
                 style: {
                     fontSize: "12px",
-                    fontFamily: "Helvetica, Arial, sans-serif",
+                    fontFamily: "inherit",
                     fontWeight: 500,
                     colors: "#333",
                 },
@@ -178,47 +212,62 @@ export function CustomPricing() {
         },
         fill: {
             type: "solid",
-            colors: ["#b39ae9", "#b39ae9", "#6e18ef"],
+            // Match colors from original options if specific
+            colors: ["#b39ae9", "#b39ae9", "#6e18ef"], // Example: Shopify, Woo, Custom
         },
         tooltip: {
             y: {
                 formatter: function (val) {
-                    return " $ " + val;
+                    return "$ " + val.toLocaleString(); // Format tooltip value
                 },
             },
             style: {
                 fontSize: "12px",
-                fontFamily: "Helvetica, Arial, sans-serif",
+                fontFamily: "inherit",
             },
         },
         states: {
             hover: {
                 filter: {
                     type: "lighten",
-                    value: 0.15,
+                    value: 0.05, // Less intense hover
                 },
             },
+            active: { // Define active state (when clicking a bar, if needed)
+                filter: {
+                    type: 'darken',
+                    value: 0.9
+                }
+            }
         },
-        animations: {
-            enabled: true,
-            easing: "easeinout",
-            speed: 800,
-            animateGradually: {
-                enabled: true,
-                delay: 150,
+        grid: { // Add subtle grid lines
+            borderColor: '#e7e7e7',
+            row: {
+                colors: ['#f3f3f3', 'transparent'], // Zebra stripes
+                opacity: 0.5
             },
-            dynamicAnimation: {
-                enabled: true,
-                speed: 350,
-            },
         },
-        dropShadow: {
-            enabled: true,
-            top: 3,
-            left: 0,
-            blur: 4,
-            opacity: 0.2,
-        },
+        // Removed animations from here as they are now under chart options
+        // dropShadow: { // Optional: Keep or remove based on preference
+        //     enabled: true,
+        //     top: 3,
+        //     left: 0,
+        //     blur: 4,
+        //     opacity: 0.2,
+        // },
+    }), []); // Chart options (styles, labels etc.) don't depend on data, so empty dependency array
+
+    // --- Calculations ---
+    // TODO: Make savings dynamic based on calculated costs
+    const calculateSavings = () => {
+        const shopifyCost = chartData[0];
+        const customCost = chartData[2];
+
+        if (shopifyCost > 0 && customCost < shopifyCost) {
+            const savings = ((shopifyCost - customCost) / shopifyCost) * 100;
+            return Math.round(savings); // Return rounded percentage
+        }
+        return 0; // Default to 0 if no savings or invalid data
     };
 
     const savingsPercentage = calculateSavings();
@@ -239,7 +288,7 @@ export function CustomPricing() {
                                             data-aos="zoom-in-left"
                                             data-aos-duration="700"
                                         >
-                                            Our Customized Pricing 👋
+                                            Estimate Your Costs 👋
                                         </span>
                                     </div>
                                     <h1 className="custom-pricing-headline">
@@ -248,82 +297,88 @@ export function CustomPricing() {
                                     {/* Audience Size Input & Slider */}
                                     <div className="custom-range-slider-container">
                                         <div className="custom-range-slider-label">
-                                            <label>Your Audience Size</label>
+                                            <label htmlFor="audience-input">Audience Size / mo</label>
                                             <input
+                                                id="audience-input"
                                                 type="number"
-                                                // Use temporary state for value and onChange
                                                 value={audienceInput}
                                                 onChange={handleAudienceInputChange}
-                                                // Validate on blur and Enter
                                                 onBlur={commitAudienceChange}
                                                 onKeyDown={handleAudienceKeyDown}
-                                                // Keep min/max for browser hints, but validation is manual
-                                                min={AUDIENCE_MIN}
-                                                max={AUDIENCE_MAX}
-                                                step={100} // Step might not be strictly enforced during typing
-                                                placeholder="e.g. 40000" // Add placeholder
+                                                min={AUDIENCE_LOWER_BOUND} // Min for direct input validation hint
+                                                max={AUDIENCE_UPPER_BOUND} // Max for direct input validation hint
+                                                step={100}
+                                                placeholder="e.g. 40000"
                                             />
                                         </div>
                                         <CustomRangeSlider
-                                            min={AUDIENCE_MIN} // Use bounds for slider
-                                            max={AUDIENCE_MAX}
-                                            step={100}
-                                            value={audienceSize} // Slider controlled by main state
+                                            min={AUDIENCE_MIN_SLIDER}
+                                            max={AUDIENCE_MAX_SLIDER}
+                                            step={100} // Adjust step for smoother sliding if needed
+                                            value={audienceSize}
                                             onChange={(value) => updateAudienceSize(value)} // Slider directly updates main state
                                         />
                                     </div>
                                     {/* Inventory Size Input & Slider */}
                                     <div className="custom-range-slider-container">
                                         <div className="custom-range-slider-label">
-                                            <label>Your Inventory Size</label>
+                                            <label htmlFor="inventory-input">Inventory Size (SKUs)</label>
                                             <input
+                                                id="inventory-input"
                                                 type="number"
-                                                // Use temporary state for value and onChange
                                                 value={inventoryInput}
                                                 onChange={handleInventoryInputChange}
-                                                // Validate on blur and Enter
                                                 onBlur={commitInventoryChange}
                                                 onKeyDown={handleInventoryKeyDown}
-                                                // Keep min/max for browser hints, but validation is manual
-                                                min={INVENTORY_MIN}
-                                                max={INVENTORY_MAX}
-                                                step={100} // Step might not be strictly enforced during typing
-                                                placeholder="e.g. 2000" // Add placeholder
+                                                min={INVENTORY_LOWER_BOUND} // Min for direct input validation hint
+                                                max={INVENTORY_UPPER_BOUND} // Max for direct input validation hint
+                                                step={10} // Maybe smaller step for inventory
+                                                placeholder="e.g. 2000"
                                             />
                                         </div>
                                         <CustomRangeSlider
-                                            min={INVENTORY_MIN} // Use bounds for slider
-                                            max={INVENTORY_MAX}
-                                            step={100}
-                                            value={inventorySize} // Slider controlled by main state
+                                            min={INVENTORY_MIN_SLIDER}
+                                            max={INVENTORY_MAX_SLIDER}
+                                            step={50} // Adjust step for smoother sliding if needed
+                                            value={inventorySize}
                                             onChange={(value) => updateInventorySize(value)} // Slider directly updates main state
                                         />
                                     </div>
                                 </div>
 
                                 <div className="custom-pricing-savings-area">
-                                    <span className="custom-pricing-savings-percentage">
-                                        {savingsPercentage}%
-                                    </span>
-                                    <p className="custom-pricing-savings-label">You Save</p>
+                                    {/* Conditional rendering based on calculated savings */}
+                                    {savingsPercentage > 0 ? (
+                                        <>
+                                            <span className="custom-pricing-savings-percentage">
+                                                {savingsPercentage}%
+                                            </span>
+                                            <p className="custom-pricing-savings-label">Estimated Savings vs Shopify</p>
+                                        </>
+                                    ) : (
+                                        <p className="custom-pricing-savings-label">Adjust sliders to estimate savings</p>
+                                    )}
                                 </div>
                             </div>
 
                             {/* Chart Column */}
-                            <div>
-                                {typeof window !== "undefined" && (
+                            <div className="custom-pricing-chart-col"> {/* Added a class for potential styling */}
+                                {/* Conditional rendering prevents chart flash on server/initial load */}
+                                {typeof window !== "undefined" && chartData.length > 0 && (
                                     <Chart
                                         options={chartOptions}
-                                        series={chartOptions.series}
+                                        // Pass series dynamically here
+                                        series={[{ name: 'Estimated Cost', data: chartData }]}
                                         type="bar"
-                                        height={420}
-                                        width={600}
+                                        height={420} // Adjust height as needed
+                                        width="100%" // Make width responsive
                                     />
                                 )}
                             </div>
                         </div>
                     </div>
                 </div>
+                <div className="space30"></div> {/* Add spacing below card */}
             </div>
         </div>
     );
