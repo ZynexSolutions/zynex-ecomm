@@ -19,162 +19,161 @@
  *                          and its estimated minimum and maximum monthly cost.
  *                          Example:
  *                          [
- *                              {platform: 'Shopify', min_cost: 149, max_cost: 455, notes: ''},
- *                              {platform: 'WooCommerce (AWS)', min_cost: 110, max_cost: 290, notes: ''},
- *                              {platform: 'Medusa JS (AWS)', min_cost: 160, max_cost: 330, notes: ''}
- *                          ]
- *                          The 'max_cost' will be set to Infinity if the document indicated '+'.
+/**
+ * Estimates the monthly cost range for Shopify, WooCommerce (on AWS),
+ * and Medusa JS (on AWS) based on user count and inventory size.
+ * Incorporates linear scaling within brackets and ensures Woo > Custom cost.
+ *
+ * Note: These are rough estimates. Scaling factors are illustrative.
+ * Actual costs depend heavily on specific usage, configuration, and choices.
+ *
+ * @param {number} user_count Estimated number of monthly users.
+ * @param {number} inventory_size Estimated number of distinct inventory items (SKUs).
+ * @returns {Array<Object>} An array containing objects with platform costs.
  */
 export function estimateEcommerceCosts(user_count, inventory_size) {
     const results = [];
-    const plusNote = "Upper range can be significantly higher ('+' in source).";
+    const plusNote = "Upper range scales significantly and can be higher.";
 
-    // --- Shopify Cost Estimation (Based on Table 1 logic) ---
-    let shopifyMin = 0;
-    let shopifyMax = 0;
-    let shopifyNote = "";
+    // --- Define Base Brackets & Scaling Factors (Illustrative Estimates) ---
+    // [user_threshold, item_threshold, baseMin, baseMax, userFactorMin, itemFactorMin, userFactorMax, itemFactorMax]
+    const shopifyBrackets = [
+        // Basic Plan Level
+        { threshold: 0, item_base: 0, baseMin: 39, baseMax: 119, uFMin: 0.01, iFMin: 0.1, uFMax: 0.02, iFMax: 0.5 }, // Slight scale for apps/txns
+        // Shopify Plan Level
+        { threshold: 100, item_base: 10, baseMin: 149, baseMax: 455, uFMin: 0.02, iFMin: 0.2, uFMax: 0.05, iFMax: 1.0 }, // Apps/Txns scale more
+        // Advanced Plan Level
+        { threshold: 1000, item_base: 100, baseMin: 949, baseMax: 2899, uFMin: 0.03, iFMin: 0.3, uFMax: 0.10, iFMax: 1.5 }, // Higher apps/txns/features
+        // Shopify Plus Level (Base cost + Significant Scaling)
+        { threshold: 10000, item_base: 1000, baseMin: 7800, baseMax: Infinity, uFMin: 0.05, iFMin: 0.4, uFMax: 0.15, iFMax: 2.0 } // Base + scaling for apps/txns/support
+    ];
 
-    if (user_count <= 100) {
-        // Corresponds roughly to 10 inventory -> Basic Plan
-        [shopifyMin, shopifyMax] = [39, 119];
-    } else if (user_count <= 1000) {
-        // Corresponds roughly to 100 inventory -> Shopify Plan
-        [shopifyMin, shopifyMax] = [149, 455];
-    } else if (user_count <= 10000) {
-        // Corresponds roughly to 1,000 inventory -> Advanced Plan
-        [shopifyMin, shopifyMax] = [949, 2899];
-    } else { // user_count > 10000
-        // Corresponds roughly to 10,000 inventory -> Shopify Plus
-        [shopifyMin, shopifyMax] = [7800, Infinity];
-        shopifyNote = plusNote;
+    const wooBrackets = [
+        { threshold: 0, item_base: 0, baseMin: 35, baseMax: 90, uFMin: 0.02, iFMin: 0.01, uFMax: 0.04, iFMax: 0.05 }, // Basic AWS + plugins
+        { threshold: 100, item_base: 10, baseMin: 110, baseMax: 290, uFMin: 0.03, iFMin: 0.02, uFMax: 0.07, iFMax: 0.10 }, // Slightly bigger AWS
+        { threshold: 1000, item_base: 100, baseMin: 320, baseMax: 760, uFMin: 0.05, iFMin: 0.03, uFMax: 0.10, iFMax: 0.15 }, // Scaling AWS needs
+        { threshold: 10000, item_base: 1000, baseMin: 840, baseMax: Infinity, uFMin: 0.07, iFMin: 0.05, uFMax: 0.15, iFMax: 0.25 } // Significant AWS scaling
+    ];
+
+    const medusaBrackets = [ // Medusa ("Your Custom Store")
+        { threshold: 0, item_base: 0, baseMin: 60, baseMax: 125, uFMin: 0.01, iFMin: 0.01, uFMax: 0.03, iFMax: 0.04 }, // Basic AWS optimized
+        { threshold: 100, item_base: 10, baseMin: 160, baseMax: 330, uFMin: 0.02, iFMin: 0.015, uFMax: 0.05, iFMax: 0.08 }, // Slightly bigger optimized AWS
+        { threshold: 1000, item_base: 100, baseMin: 430, baseMax: 920, uFMin: 0.03, iFMin: 0.02, uFMax: 0.08, iFMax: 0.12 }, // Scaling optimized AWS
+        { threshold: 10000, item_base: 1000, baseMin: 1200, baseMax: Infinity, uFMin: 0.04, iFMin: 0.03, uFMax: 0.12, iFMax: 0.20 } // Significant optimized AWS scaling
+    ];
+
+    // Helper to find the correct bracket
+    const findBracket = (brackets, count) => {
+        let selectedBracket = brackets[0];
+        for (let i = brackets.length - 1; i >= 0; i--) {
+            if (count >= brackets[i].threshold) {
+                selectedBracket = brackets[i];
+                break;
+            }
+        }
+        return selectedBracket;
+    };
+
+    // Helper to calculate scaled cost
+    const calculateCost = (bracket, userCount, inventoryCount) => {
+        const excessUsers = Math.max(0, userCount - bracket.threshold);
+        // Scale items based on the excess over the *bracket's assumed item base*
+        const excessItems = Math.max(0, inventoryCount - bracket.item_base);
+
+        let min_cost = bracket.baseMin + (excessUsers * bracket.uFMin) + (excessItems * bracket.iFMin);
+        let max_cost = bracket.baseMax; // Start with base max
+
+        if (max_cost !== Infinity) {
+            // Apply scaling to the max cost as well, if it's not Infinity
+            // Use potentially higher scaling factors for the upper range estimate
+            max_cost += (excessUsers * bracket.uFMax) + (excessItems * bracket.iFMax);
+            // Ensure max is never less than min after scaling
+            max_cost = Math.max(min_cost, max_cost);
+        } else {
+            // If baseMax is Infinity, min cost still scales up
+            // max_cost remains Infinity
+        }
+
+        return { min_cost, max_cost };
+    };
+
+    // --- Calculate Costs for each Platform ---
+    const shopifyBracket = findBracket(shopifyBrackets, user_count);
+    const wooBracket = findBracket(wooBrackets, user_count);
+    const medusaBracket = findBracket(medusaBrackets, user_count);
+
+    let { min_cost: shopifyMin, max_cost: shopifyMax } = calculateCost(shopifyBracket, user_count, inventory_size);
+    let { min_cost: wooMin, max_cost: wooMax } = calculateCost(wooBracket, user_count, inventory_size);
+    let { min_cost: medusaMin, max_cost: medusaMax } = calculateCost(medusaBracket, user_count, inventory_size);
+
+    let shopifyNote = shopifyMax === Infinity ? plusNote : "";
+    let wooNote = wooMax === Infinity ? plusNote : "";
+    let medusaNote = medusaMax === Infinity ? plusNote : "";
+
+
+    // --- Apply Business Rule: WooCommerce Cost >= 110% of Medusa Cost ---
+    const minWooTarget = medusaMin * 1.10;
+    if (wooMin < minWooTarget) {
+        const adjustment = minWooTarget - wooMin;
+        wooMin = minWooTarget;
+        // Also adjust wooMax proportionally upwards if it's not Infinity
+        if (wooMax !== Infinity) {
+            // Adjust max by at least the same amount, maybe more proportionally
+            // Simple approach: add the same difference.
+            wooMax += adjustment;
+            // Ensure max is still >= min
+            wooMax = Math.max(wooMin, wooMax);
+        }
+        wooNote += " (Adjusted to be >10% higher than Custom)";
     }
 
-    // Heuristic adjustment for inventory mismatch
-    if (user_count <= 100 && inventory_size > 100) { // Small users, large inventory
-        shopifyMin = Math.max(shopifyMin, 149); // Likely needs apps pushing cost towards next tier
-        shopifyMax = shopifyMax !== Infinity ? Math.max(shopifyMax, 455) : Infinity;
-    } else if (user_count <= 1000 && inventory_size > 1000) { // Medium users, large inventory
-        shopifyMin = Math.max(shopifyMin, 949);
-        shopifyMax = shopifyMax !== Infinity ? Math.max(shopifyMax, 2899) : Infinity;
-    } else if (user_count <= 10000 && inventory_size > 10000) { // Large users, very large inventory
-        shopifyMin = Math.max(shopifyMin, 7800);
-        shopifyMax = Infinity; // Definitely pushes into Plus territory / higher app costs
-        shopifyNote = plusNote;
+    // Ensure Woo Max is Infinity if Medusa Max is, for the highest bracket
+    if (medusaMax === Infinity && wooBracket.threshold === medusaBracket.threshold && wooMax !== Infinity) {
+        // If they are in the same highest bracket based on user count
+        wooMax = Infinity;
+        wooNote = plusNote + (wooNote.includes("Adjusted") ? " (Adjusted...)" : ""); // Combine notes
     }
 
+
+    // --- Format Results ---
     results.push({
         platform: 'Shopify',
-        min_cost: shopifyMin,
-        max_cost: shopifyMax,
-        notes: shopifyNote
+        min_cost: Math.ceil(shopifyMin),
+        max_cost: shopifyMax === Infinity ? Infinity : Math.ceil(shopifyMax),
+        notes: shopifyNote.trim()
     });
-
-    // --- WooCommerce on AWS Cost Estimation (Based on Table 2 logic) ---
-    let wooMin = 0;
-    let wooMax = 0;
-    let wooNote = "";
-
-    if (user_count <= 100) {
-        // Corresponds roughly to 10 inventory
-        [wooMin, wooMax] = [35, 90];
-    } else if (user_count <= 1000) {
-        // Corresponds roughly to 100 inventory
-        [wooMin, wooMax] = [110, 290];
-    } else if (user_count <= 10000) {
-        // Corresponds roughly to 1,000 inventory
-        [wooMin, wooMax] = [320, 760];
-    } else { // user_count > 10000
-        // Corresponds roughly to 10,000 inventory
-        [wooMin, wooMax] = [840, Infinity];
-        wooNote = plusNote;
-    }
-
-    // Heuristic adjustment for inventory mismatch (AWS costs sensitive to storage/DB size)
-    if (user_count <= 100 && inventory_size > 100) {
-        wooMin = Math.max(wooMin, 110); // Higher AWS/plugin costs expected
-        wooMax = wooMax !== Infinity ? Math.max(wooMax, 290) : Infinity;
-    } else if (user_count <= 1000 && inventory_size > 1000) {
-        wooMin = Math.max(wooMin, 320);
-        wooMax = wooMax !== Infinity ? Math.max(wooMax, 760) : Infinity;
-    } else if (user_count <= 10000 && inventory_size > 10000) {
-        wooMin = Math.max(wooMin, 840);
-        wooMax = Infinity; // Higher tier AWS resources likely needed
-        wooNote = plusNote;
-    }
 
     results.push({
         platform: 'WooCommerce (AWS)',
-        min_cost: wooMin,
-        max_cost: wooMax,
-        notes: wooNote
+        min_cost: Math.ceil(wooMin),
+        max_cost: wooMax === Infinity ? Infinity : Math.ceil(wooMax),
+        notes: wooNote.trim()
     });
 
-    // --- Medusa JS on AWS Cost Estimation (Based on Table 3 logic) ---
-    let medusaMin = 0;
-    let medusaMax = 0;
-    let medusaNote = "";
-
-    if (user_count <= 100) {
-        // Corresponds roughly to 10 inventory
-        [medusaMin, medusaMax] = [60, 125];
-    } else if (user_count <= 1000) {
-        // Corresponds roughly to 100 inventory
-        [medusaMin, medusaMax] = [160, 330];
-    } else if (user_count <= 10000) {
-        // Corresponds roughly to 1,000 inventory
-        [medusaMin, medusaMax] = [430, 920];
-    } else { // user_count > 10000
-        // Corresponds roughly to 10,000 inventory
-        [medusaMin, medusaMax] = [1200, Infinity];
-        medusaNote = plusNote;
-    }
-
-    // Heuristic adjustment for inventory mismatch (AWS costs sensitive to storage/DB size)
-    if (user_count <= 100 && inventory_size > 100) {
-        medusaMin = Math.max(medusaMin, 160); // Higher AWS costs expected
-        medusaMax = medusaMax !== Infinity ? Math.max(medusaMax, 330) : Infinity;
-    } else if (user_count <= 1000 && inventory_size > 1000) {
-        medusaMin = Math.max(medusaMin, 430);
-        medusaMax = medusaMax !== Infinity ? Math.max(medusaMax, 920) : Infinity;
-    } else if (user_count <= 10000 && inventory_size > 10000) {
-        medusaMin = Math.max(medusaMin, 1200);
-        medusaMax = Infinity; // Higher tier AWS resources needed
-        medusaNote = plusNote;
-    }
-
-    results.push({
+    results.push({ // Represents "Your Custom Store"
         platform: 'Medusa JS (AWS)',
-        min_cost: medusaMin,
-        max_cost: medusaMax,
-        notes: medusaNote
-    });
-
-    // Final formatting (apply Math.ceil to non-infinite costs)
-    results.forEach(result => {
-        // Always ceil min_cost
-        result.min_cost = Math.ceil(result.min_cost);
-        // Only ceil max_cost if it's not Infinity
-        if (result.max_cost !== Infinity) {
-            result.max_cost = Math.ceil(result.max_cost);
-        }
+        min_cost: Math.ceil(medusaMin),
+        max_cost: medusaMax === Infinity ? Infinity : Math.ceil(medusaMax),
+        notes: medusaNote.trim()
     });
 
     return results;
 }
 
-// --- Helper function for Example Usage Formatting ---
+
+// --- Example Usage Formatting (No change needed from previous version) ---
 function formatCostOutput(cost) {
     let maxCostStr;
-    // Use known upper bounds from document examples when Infinity is the calculated max
     if (cost.max_cost === Infinity) {
-        if (cost.platform === 'Shopify') maxCostStr = "24300+";
-        else if (cost.platform === 'WooCommerce (AWS)') maxCostStr = "2100+";
-        else if (cost.platform === 'Medusa JS (AWS)') maxCostStr = "2750+";
-        else maxCostStr = "N/A+"; // Generic fallback if somehow another platform ended up Infinity
+        // Use indicative upper bounds if available, or generic '+'
+        // These could be dynamically estimated too, but for simplicity:
+        if (cost.platform === 'Shopify') maxCostStr = `${Math.ceil(cost.min_cost * 2.5)}+`; // Example scaling for display
+        else if (cost.platform === 'WooCommerce (AWS)') maxCostStr = `${Math.ceil(cost.min_cost * 2.0)}+`; // Example scaling
+        else if (cost.platform === 'Medusa JS (AWS)') maxCostStr = `${Math.ceil(cost.min_cost * 1.8)}+`; // Example scaling
+        else maxCostStr = `${cost.min_cost}+`;
     } else {
         maxCostStr = `${cost.max_cost}`;
     }
-    // Ensure notes string is not undefined/null before appending
-    const notesString = cost.notes ? ` ${cost.notes}` : "";
+    const notesString = cost.notes ? ` (${cost.notes})` : ""; // Wrap notes in parens
     return `  - ${cost.platform}: $${cost.min_cost} - $${maxCostStr} per month${notesString}`;
 }
