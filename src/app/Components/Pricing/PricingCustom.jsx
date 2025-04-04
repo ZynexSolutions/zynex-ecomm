@@ -296,7 +296,7 @@ export function CustomPricing() {
   };
 
   const savingsPercentage = calculateSavings();
-  // --- End Calculation Logic ---
+  // --- End Calculation Logic --
 
   return (
     <div className="pricing sp">
